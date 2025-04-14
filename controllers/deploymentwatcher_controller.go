@@ -75,6 +75,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 				container := &deploy.Spec.Template.Spec.Containers[0]
 				// 如果需要注入
 				if jmx.Spec.EnableInjection {
+					logger.Info("需要注入")
 					// 添加挂载路径
 					mountPathExists := false
 					for _, vm := range container.VolumeMounts {
@@ -181,7 +182,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 						Value: value,
 					})
 				}
-
+				logger.Info("Deployment 修改成功", "name", deploy.Name)
 				break
 			}
 		}
