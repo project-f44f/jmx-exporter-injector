@@ -1,0 +1,6 @@
+domain: jmx.f44f.com
+layout:
+- go.kubebuilder.io/v3
+projectName: jmx-exporter-injector
+repo: github.com/project-f44f/jmx-exporter-injector
+version: "3"
