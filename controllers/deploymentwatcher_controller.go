@@ -75,12 +75,12 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 				container := &deploy.Spec.Template.Spec.Containers[0]
 				// 如果需要注入
 				if jmx.Spec.EnableInjection {
-					logger.Info("需要注入")
 					// 添加挂载路径
 					mountPathExists := false
 					for _, vm := range container.VolumeMounts {
 						if vm.MountPath == "/khaos/" {
 							mountPathExists = true
+							logger.Info("挂载路径 已存在")
 							break
 						}
 					}
@@ -95,6 +95,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 					for _, ic := range deploy.Spec.Template.Spec.InitContainers {
 						if ic.Name == "init-preset-file" {
 							initExists = true
+							logger.Info("initcontainer 已存在")
 							break
 						}
 					}
@@ -127,6 +128,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 					for _, vol := range deploy.Spec.Template.Spec.Volumes {
 						if vol.Name == "preset-file" {
 							volumeExists = true
+							logger.Info("volume 已存在")
 							break
 						}
 					}
@@ -146,6 +148,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 				} else {
 					port = "8088"
 				}
+				logger.Info("检测到port为" + port)
 				// 定义 JAVA_TOOL_OPTIONS 环境变量的值
 				name := "JAVA_TOOL_OPTIONS"
 				value := "-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar=" + port + ":/khaos/jmx/prometheus-jmx-config.yaml"
@@ -157,6 +160,7 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 						envValue := env.Value
 						// 检查值是否完全一致
 						if envValue == value {
+							logger.Info("环境变量的值和目标值完全一致")
 							// 如果环境变量的值和目标值完全一致，什么都不做
 							break
 						}
@@ -164,9 +168,11 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 						// 如果存在 -javaagent，并且只有 port 部分不同，则替换 port
 						if strings.Contains(envValue, "-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar") {
 							// 使用正则表达式替换掉旧的 port 部分
+							logger.Info("port 不一样")
 							updatedValue := strings.Replace(envValue, `-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar=.*?config.yaml`, "-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar="+port+":/khaos/jmx/prometheus-jmx-config.yaml", 1)
 							container.Env[i].Value = updatedValue
 						} else {
+							logger.Info("完全不一样，拼接")
 							// 如果环境变量值完全不同，直接在后面拼接新值
 							container.Env[i].Value = envValue + " " + value
 						}
