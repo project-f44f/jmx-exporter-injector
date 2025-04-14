@@ -1,0 +1,24 @@
+# permissions for end users to edit jmxexporters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jmxexporter-editor-role
+rules:
+- apiGroups:
+  - jmx.f44f.com.jmx.f44f.com
+  resources:
+  - jmxexporters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - jmx.f44f.com.jmx.f44f.com
+  resources:
+  - jmxexporters/status
+  verbs:
+  - get

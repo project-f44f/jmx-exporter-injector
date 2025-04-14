@@ -1,0 +1,6 @@
+apiVersion: jmx.f44f.com.jmx.f44f.com/v1
+kind: JmxExporter
+metadata:
+  name: jmxexporter-sample
+spec:
+  # TODO(user): Add fields here

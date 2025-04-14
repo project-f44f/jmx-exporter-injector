@@ -3,4 +3,14 @@ layout:
 - go.kubebuilder.io/v3
 projectName: jmx-exporter-injector
 repo: github.com/project-f44f/jmx-exporter-injector
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: jmx.f44f.com
+  group: jmx.f44f.com
+  kind: JmxExporter
+  path: github.com/project-f44f/jmx-exporter-injector/api/v1
+  version: v1
 version: "3"
