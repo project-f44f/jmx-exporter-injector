@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	jmxv1 "github.com/project-f44f/jmx-exporter-injector/api/v1"
@@ -169,7 +170,9 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 						if strings.Contains(envValue, "-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar") {
 							// 使用正则表达式替换掉旧的 port 部分
 							logger.Info("port 不一样")
-							updatedValue := strings.Replace(envValue, `-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar=.*?config.yaml`, "-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1.0.1.jar="+port+":/khaos/jmx/prometheus-jmx-config.yaml", 1)
+							pattern := `-javaagent:/khaos/jmx/jmx_prometheus_javaagent-1\.0\.1\.jar=[^ ]*/khaos/jmx/prometheus-jmx-config\.yaml`
+							re := regexp.MustCompile(pattern)
+							updatedValue := re.ReplaceAllString(envValue, value)
 							container.Env[i].Value = updatedValue
 						} else {
 							logger.Info("完全不一样，拼接")
