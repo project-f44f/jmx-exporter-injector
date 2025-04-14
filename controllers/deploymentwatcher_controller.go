@@ -182,6 +182,10 @@ func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Re
 						Value: value,
 					})
 				}
+				if err := r.Update(ctx, &deploy); err != nil {
+					logger.Error(err, "更新 Deployment 失败")
+					return ctrl.Result{}, err
+				}
 				logger.Info("Deployment 修改成功", "name", deploy.Name)
 				break
 			}
