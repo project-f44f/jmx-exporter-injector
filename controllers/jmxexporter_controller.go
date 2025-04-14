@@ -19,12 +19,13 @@ package controllers
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	jmxf44fcomv1 "github.com/project-f44f/jmx-exporter-injector/api/v1"
+	jmxv1 "github.com/project-f44f/jmx-exporter-injector/api/v1"
 )
 
 // JmxExporterReconciler reconciles a JmxExporter object
@@ -47,16 +48,35 @@ type JmxExporterReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.10.0/pkg/reconcile
 func (r *JmxExporterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var jmxExporter jmxv1.JmxExporter
+	if err := r.Get(ctx, req.NamespacedName, &jmxExporter); err != nil {
+		if errors.IsNotFound(err) {
+			logger.Info("JmxExporter resource deleted.")
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "unable to fetch JmxExporter")
+		return ctrl.Result{}, err
+	}
+
+	// 输出 CRD 的关键信息
+	logger.Info("Reconciled JmxExporter", "name", jmxExporter.Name,
+		"namespace", jmxExporter.Namespace,
+		"annotationKey", jmxExporter.Spec.DeploymentAnnotationKey,
+		"annotationValue", jmxExporter.Spec.DeploymentAnnotationValue,
+		"enableInjection", jmxExporter.Spec.EnableInjection,
+		"exposeServicePort", jmxExporter.Spec.ExposeServicePort,
+		"createServiceMonitor", jmxExporter.Spec.CreateServiceMonitor,
+	)
 
 	return ctrl.Result{}, nil
+
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *JmxExporterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&jmxf44fcomv1.JmxExporter{}).
+		For(&jmxv1.JmxExporter{}).
 		Complete(r)
 }
