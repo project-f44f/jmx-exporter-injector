@@ -34,9 +34,9 @@ type JmxExporterReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=jmx.f44f.com.jmx.f44f.com,resources=jmxexporters,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=jmx.f44f.com.jmx.f44f.com,resources=jmxexporters/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=jmx.f44f.com.jmx.f44f.com,resources=jmxexporters/finalizers,verbs=update
+//+kubebuilder:rbac:groups=jmx.f44f.com,resources=jmxexporters,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=jmx.f44f.com,resources=jmxexporters/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=jmx.f44f.com,resources=jmxexporters/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
