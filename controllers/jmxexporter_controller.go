@@ -59,16 +59,6 @@ func (r *JmxExporterReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		logger.Error(err, "unable to fetch JmxExporter")
 		return ctrl.Result{}, err
 	}
-
-	// 输出 CRD 的关键信息
-	logger.Info("Reconciled JmxExporter", "name", jmxExporter.Name,
-		"namespace", jmxExporter.Namespace,
-		"annotationValue", jmxExporter.Spec.DeploymentAnnotationValue,
-		"enableInjection", jmxExporter.Spec.EnableInjection,
-		"exposeServicePort", jmxExporter.Spec.ExposeServicePort,
-		"createServiceMonitor", jmxExporter.Spec.CreateServiceMonitor,
-	)
-
 	return ctrl.Result{}, nil
 
 }

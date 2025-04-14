@@ -29,10 +29,12 @@ type JmxExporterSpec struct {
 	DeploymentAnnotationValue string `json:"deploymentAnnotationValue"`
 	// 是否启用 JMX Exporter 注入到匹配的 Deployment 中
 	EnableInjection bool `json:"enableInjection"`
-	// 是否在 Service 中暴露 JMX Exporter 的端口
-	ExposeServicePort bool `json:"exposeServicePort"`
-	// 是否创建 ServiceMonitor 资源
-	CreateServiceMonitor bool `json:"createServiceMonitor"`
+	// InitContainer 使用的基础镜像
+	JmxExporterImage string `json:"jmxExporterImage"`
+	// servicemonitor 使用的label
+	ServiceMonitorLabelValue string `json:"serviceMonitorLabelValue"`
+	// 指定暴露端口的 service 名称
+	ServiceName string `json:"serviceName"`
 }
 
 // JmxExporterStatus defines the observed state of JmxExporter
