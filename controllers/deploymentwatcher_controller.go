@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 
+	jmxv1 "github.com/project-f44f/jmx-exporter-injector/api/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -32,9 +33,7 @@ type DeploymentWatcherReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=apps,resources=deploymentwatchers,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apps,resources=deploymentwatchers/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=apps,resources=deploymentwatchers/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;update;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -46,16 +45,39 @@ type DeploymentWatcherReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.10.0/pkg/reconcile
 func (r *DeploymentWatcherReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var deploy appsv1.Deployment
+	if err := r.Get(ctx, req.NamespacedName, &deploy); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
+	// 获取所有 JmxExporter 对象
+	var jmxList jmxv1.JmxExporterList
+	if err := r.List(ctx, &jmxList); err != nil {
+		logger.Error(err, "无法列出 JmxExporter")
+		return ctrl.Result{}, err
+	}
+	for _, jmx := range jmxList.Items {
+		val := jmx.Spec.DeploymentAnnotationValue
+
+		if deploy.Annotations != nil {
+			if deployVal, ok := deploy.Annotations["jmx.f44f.com/jmx-exporter"]; ok && deployVal == val {
+				logger.Info("匹配到 JmxExporter 策略",
+					"deployment", deploy.Name,
+					"namespace", deploy.Namespace,
+					"annotationValue", val,
+					"jmxexporter", jmx.Name,
+				)
+			}
+		}
+	}
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DeploymentWatcherReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&appsv1.DeploymentWatcher{}).
+		For(&appsv1.Deployment{}).
 		Complete(r)
 }

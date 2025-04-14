@@ -63,7 +63,6 @@ func (r *JmxExporterReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// 输出 CRD 的关键信息
 	logger.Info("Reconciled JmxExporter", "name", jmxExporter.Name,
 		"namespace", jmxExporter.Namespace,
-		"annotationKey", jmxExporter.Spec.DeploymentAnnotationKey,
 		"annotationValue", jmxExporter.Spec.DeploymentAnnotationValue,
 		"enableInjection", jmxExporter.Spec.EnableInjection,
 		"exposeServicePort", jmxExporter.Spec.ExposeServicePort,

@@ -22,15 +22,10 @@ spec:
             spec:
               type: object
               properties:
-                deploymentAnnotationKey:
-                  type: string
-                  description: "The key of the annotation used for matching Deployments."
-                  default: "f44f-jmx-exporter"
-                  example: "f44f-jmx-exporter"
                 deploymentAnnotationValue:
-                  type: boolean
+                  type: string
                   description: "The value of the annotation used for matching Deployments."
-                  default: true
+                  default: "true"
                 enableInjection:
                   type: boolean
                   description: "Whether to enable JMX exporter injection into matching Deployments."
